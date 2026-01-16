@@ -3,3 +3,6 @@ data/
 __pycached__/
 .env 
 *.pyc
+vectorstore/
+*.faiss
+*.pkl 

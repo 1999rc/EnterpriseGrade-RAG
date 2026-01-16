@@ -1,28 +1,26 @@
-from langchain_huggingface import HuggingFaceEmbeddings
-#from langchain_community.embeddings import HuggingFaceEmbeddings 
 from langchain_community.vectorstores import FAISS 
+from langchain_huggingface import HuggingFaceEmbeddings 
+from chunk_documents import chunk_documents 
 from pathlib import Path 
-import pickle 
 
 INDEX_DIR=Path('vectorstore')
 INDEX_DIR.mkdir(exist_ok=True)
 
-with open('data/chunks.pkl','rb')as f:
-    chunks=pickle.load(f)
+def build_index():
+    print('Loading & chunking documents...')
+    chunks=chunk_documents('data/raw')
 
-print(f'EMBADDING {len(chunks)}chunks...')
+    print(f'Embedding:{len(chunks)}:chunks')
 
-embeddings=HuggingFaceEmbeddings(
-    model_name='sentence-transformers/all-MiniLM-L6-v2'
-)
+    embeddings=HuggingFaceEmbeddings(
+        model_name='sentence-transformers/all-MiniLm-L6-v2'
+    )
 
-db=FAISS.from_documents(chunks,embeddings)
+    vectorstore=FAISS.from_documents(chunks,
+                                     embeddings)
+    vectorstore.save_local(INDEX_DIR)
 
-db.save_local(str(INDEX_DIR))
-
-print('FAISS index built and saved successfully!')
-import pickle 
-Path('data').mkdir(exist_ok=True)
-
-with open('data/chunks.pkl','wb')as f:
-    pickle.dump(chunks,f)
+    print('FAISS:index created successfully😎')
+if __name__=='__main__':
+    build_index()
+    
