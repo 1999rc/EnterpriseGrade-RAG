@@ -1,0 +1,5 @@
+.venv/
+data/
+__pycached__/
+.env 
+*.pyc
